@@ -2,39 +2,40 @@ const SUPABASE_URL = "https://vqzeylsdjlrrigeknqlu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxemV5bHNkamxycmlnZWtucWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzkzNTQsImV4cCI6MjA5MDAxNTM1NH0.No8HXsDYHyu4Vb-NoV-sq3bYOPdGxAeM2dErc-jSDAo";
 const ONESIGNAL_APP_ID = "6ab98437-83b7-4cdb-8dfe-704a76ca3da6";
 
+// Usernames are stored as username@daralert.app internally
+function toEmail(username) {
+  return username.toLowerCase().trim() + "@daralert.app";
+}
+
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // DOM refs
-const emailInput       = document.getElementById("emailInput");
-const passwordInput    = document.getElementById("passwordInput");
-const signInBtn        = document.getElementById("signInBtn");
-const signUpBtn        = document.getElementById("signUpBtn");
-const adminStatus      = document.getElementById("adminStatus");
-const adminUid         = document.getElementById("adminUid");
-const adminControls    = document.getElementById("adminControls");
-const newAdminUid      = document.getElementById("newAdminUid");
-const addAdminBtn      = document.getElementById("addAdminBtn");
-const alertsList       = document.getElementById("alertsList");
-const requestsList     = document.getElementById("requestsList");
-const requestAdminBtn  = document.getElementById("requestAdminBtn");
-const copyUidBtn       = document.getElementById("copyUidBtn");
-const recheckAdminBtn  = document.getElementById("recheckAdminBtn");
-const signOutBtn       = document.getElementById("signOutBtn");
-const enablePushBtn    = document.getElementById("enablePushBtn");
-const pushStatus       = document.getElementById("pushStatus");
+const usernameInput   = document.getElementById("usernameInput");
+const passwordInput   = document.getElementById("passwordInput");
+const signInBtn       = document.getElementById("signInBtn");
+const signUpBtn       = document.getElementById("signUpBtn");
+const adminStatus     = document.getElementById("adminStatus");
+const adminControls   = document.getElementById("adminControls");
+const newAdminUid     = document.getElementById("newAdminUid");
+const addAdminBtn     = document.getElementById("addAdminBtn");
+const alertsList      = document.getElementById("alertsList");
+const requestsList    = document.getElementById("requestsList");
+const requestAdminBtn = document.getElementById("requestAdminBtn");
+const recheckAdminBtn = document.getElementById("recheckAdminBtn");
+const signOutBtn      = document.getElementById("signOutBtn");
+const enablePushBtn   = document.getElementById("enablePushBtn");
+const pushStatus      = document.getElementById("pushStatus");
 
-let alertsChannel  = null;
+let alertsChannel   = null;
 let requestsChannel = null;
-let isAdmin        = false;
-let currentUser    = null;
+let isAdmin         = false;
+let currentUser     = null;
 
-// Service worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
 }
 
-// OneSignal init (deferred so SDK has time to load)
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(function (OneSignal) {
   OneSignal.init({ appId: ONESIGNAL_APP_ID, notifyButton: { enable: false } });
@@ -43,29 +44,28 @@ OneSignalDeferred.push(function (OneSignal) {
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 signInBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
+  const username = usernameInput.value.trim();
   const password = passwordInput.value;
-  if (!email || !password) { adminStatus.textContent = "Enter email and password."; return; }
+  if (!username || !password) { adminStatus.textContent = "Enter username and password."; return; }
   adminStatus.textContent = "Signing in…";
-  const { error } = await db.auth.signInWithPassword({ email, password });
+  const { error } = await db.auth.signInWithPassword({ email: toEmail(username), password });
   if (error) adminStatus.textContent = friendlyError(error.message);
 });
 
 signUpBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
+  const username = usernameInput.value.trim();
   const password = passwordInput.value;
-  if (!email || !password) { adminStatus.textContent = "Enter email and password."; return; }
+  if (!username || !password) { adminStatus.textContent = "Enter username and password."; return; }
   if (password.length < 6) { adminStatus.textContent = "Password must be at least 6 characters."; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) { adminStatus.textContent = "Username can only contain letters, numbers, and underscores."; return; }
   adminStatus.textContent = "Creating account…";
-  const { error } = await db.auth.signUp({ email, password });
+  const { error } = await db.auth.signUp({
+    email: toEmail(username),
+    password,
+    options: { data: { username } }
+  });
   if (error) adminStatus.textContent = friendlyError(error.message);
-  else adminStatus.textContent = "Account created! Sign in now (or confirm email first if required).";
-});
-
-copyUidBtn.addEventListener("click", async () => {
-  if (!currentUser) return;
-  await navigator.clipboard.writeText(currentUser.id);
-  adminStatus.textContent = "UID copied.";
+  else adminStatus.textContent = "Account created! Sign in now.";
 });
 
 recheckAdminBtn.addEventListener("click", async () => {
@@ -93,9 +93,10 @@ addAdminBtn.addEventListener("click", async () => {
 
 requestAdminBtn.addEventListener("click", async () => {
   if (!currentUser) { adminStatus.textContent = "Sign in first."; return; }
+  const username = currentUser.email.replace("@daralert.app", "");
   const { error } = await db.from("admin_requests").insert({
     user_id: currentUser.id,
-    email: currentUser.email
+    email: username
   });
   if (error) { adminStatus.textContent = "Request failed."; console.error(error); return; }
   adminStatus.textContent = "Request sent. An admin will review it.";
@@ -118,7 +119,6 @@ db.auth.onAuthStateChange(async (_event, session) => {
   if (!session) {
     currentUser = null;
     isAdmin = false;
-    adminUid.textContent = "—";
     adminControls.hidden = true;
     stopListeners();
     alertsList.innerHTML   = "<p class=\"note\">Sign in as admin to view alerts.</p>";
@@ -126,19 +126,22 @@ db.auth.onAuthStateChange(async (_event, session) => {
     return;
   }
   currentUser = session.user;
-  adminUid.textContent = session.user.id;
+  const username = session.user.email.replace("@daralert.app", "");
+  adminStatus.textContent = `Signed in as ${username}. Checking admin status…`;
   await checkAdmin(session.user.id);
 });
 
 async function checkAdmin(uid) {
-  const { data } = await db.from("admins").select("id").eq("id", uid).maybeSingle();
+  const { data, error } = await db.rpc("check_is_admin", { user_id: uid });
+  if (error) { adminStatus.textContent = "Check failed. Try again."; console.error(error); return; }
   isAdmin = !!data;
   if (isAdmin) {
-    adminStatus.textContent = "Admin verified.";
+    const username = currentUser.email.replace("@daralert.app", "");
+    adminStatus.textContent = `Admin verified. Welcome, ${username}!`;
     adminControls.hidden = false;
     startListeners();
   } else {
-    adminStatus.textContent = "Signed in, but not an admin yet. Request access below.";
+    adminStatus.textContent = "Not an admin yet. Request access below.";
     adminControls.hidden = true;
     stopListeners();
     alertsList.innerHTML   = "<p class=\"note\">Sign in as admin to view alerts.</p>";
@@ -149,7 +152,6 @@ async function checkAdmin(uid) {
 // ── Realtime listeners ────────────────────────────────────────────────────────
 
 async function startListeners() {
-  // Initial load
   const { data: alerts } = await db
     .from("alerts").select("*").order("created_at", { ascending: false }).limit(20);
   alertsList.innerHTML = "";
@@ -162,7 +164,6 @@ async function startListeners() {
   if (requests && requests.length) requests.forEach((r) => renderRequest(r));
   else requestsList.innerHTML = "<p class=\"note\">No pending requests.</p>";
 
-  // Subscribe to new alerts
   if (!alertsChannel) {
     alertsChannel = db.channel("alerts-feed")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "alerts" },
@@ -170,14 +171,12 @@ async function startListeners() {
       .on("postgres_changes", { event: "DELETE", schema: "public", table: "alerts" },
         (p) => {
           document.getElementById(`alert-${p.old.id}`)?.remove();
-          if (!alertsList.querySelector(".alert-item")) {
+          if (!alertsList.querySelector(".alert-item"))
             alertsList.innerHTML = "<p class=\"note\">No alerts yet.</p>";
-          }
         })
       .subscribe();
   }
 
-  // Subscribe to new admin requests
   if (!requestsChannel) {
     requestsChannel = db.channel("requests-feed")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "admin_requests" },
@@ -197,7 +196,6 @@ function stopListeners() {
 
 function renderAlert(data, prepend = false) {
   alertsList.querySelector("p.note")?.remove();
-
   const item = document.createElement("div");
   item.className = "alert-item";
   item.id = `alert-${data.id}`;
@@ -227,17 +225,12 @@ function renderAlert(data, prepend = false) {
 
 function renderRequest(data, prepend = false) {
   requestsList.querySelector("p.note")?.remove();
-
   const item = document.createElement("div");
   item.className = "alert-item";
   item.id = `req-${data.id}`;
 
   const h4 = document.createElement("h4");
-  h4.textContent = data.email || data.user_id;
-
-  const uidP = document.createElement("p");
-  uidP.className = "note";
-  uidP.textContent = `UID: ${data.user_id}`;
+  h4.textContent = data.email || data.user_id;  // email column stores username
 
   const actions = document.createElement("div");
   actions.className = "hero-actions";
@@ -249,7 +242,7 @@ function renderRequest(data, prepend = false) {
     const { error } = await db.from("admins").insert({ id: data.user_id, email: data.email });
     if (error) { adminStatus.textContent = "Approve failed."; console.error(error); return; }
     await db.from("admin_requests").delete().eq("id", data.id);
-    adminStatus.textContent = "Admin approved.";
+    adminStatus.textContent = `${data.email} approved as admin.`;
   });
 
   const denyBtn = document.createElement("button");
@@ -260,15 +253,15 @@ function renderRequest(data, prepend = false) {
   });
 
   actions.append(approveBtn, denyBtn);
-  item.append(h4, uidP, actions);
+  item.append(h4, actions);
   prepend ? requestsList.prepend(item) : requestsList.append(item);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function friendlyError(msg) {
-  if (msg.includes("Invalid login credentials")) return "Invalid email or password.";
-  if (msg.includes("already registered"))        return "Account exists. Sign in instead.";
-  if (msg.includes("Email not confirmed"))        return "Confirm your email first, then sign in.";
+  if (msg.includes("Invalid login credentials")) return "Wrong username or password.";
+  if (msg.includes("already registered"))        return "Username taken. Try another.";
+  if (msg.includes("Email not confirmed"))        return "Account not confirmed. Contact admin.";
   return msg;
 }
