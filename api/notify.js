@@ -20,10 +20,10 @@ module.exports = async function (req, res) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Basic ${process.env.ONESIGNAL_REST_API_KEY}`
+      "Authorization": `Basic ${(process.env.ONESIGNAL_REST_API_KEY || "").trim()}`
     },
     body: JSON.stringify({
-      app_id: process.env.ONESIGNAL_APP_ID,
+      app_id: (process.env.ONESIGNAL_APP_ID || "").trim(),
       // Send to every device tagged as admin
       filters: [{ field: "tag", key: "role", relation: "=", value: "admin" }],
       headings: { en: `DarAlert: ${record.type}` },
