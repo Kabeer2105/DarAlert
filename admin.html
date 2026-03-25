@@ -28,14 +28,14 @@
   <main class="grid">
     <section class="card admin">
       <div class="card-header">
-        <h2>Admin Sign In</h2>
-        <p>Admins receive real-time alerts and can manage other admins.</p>
+        <h2 id="pageTitle">Sign In</h2>
+        <p id="pageSubtitle">Enter your username and password.</p>
       </div>
 
       <div class="admin-body">
 
-        <!-- Auth -->
-        <div class="admin-panel">
+        <!-- Auth panel — shown when signed out -->
+        <div id="authPanel" class="admin-panel">
           <label class="field">
             <span>Username</span>
             <input id="usernameInput" type="text" placeholder="e.g. kabeer" autocomplete="username" />
@@ -48,45 +48,47 @@
             <button id="signInBtn" class="ghost">Sign In</button>
             <button id="signUpBtn" class="ghost">Create Account</button>
           </div>
-          <p id="adminStatus" class="note"></p>
+          <p id="authStatus" class="status"></p>
+        </div>
+
+        <!-- Signed-in panel — shown when signed in but not admin -->
+        <div id="pendingPanel" class="admin-panel" hidden>
+          <p id="pendingStatus" class="note"></p>
           <div class="hero-actions">
-            <button id="recheckAdminBtn" class="ghost">Recheck</button>
-            <button id="signOutBtn" class="ghost">Sign Out</button>
+            <button id="requestAdminBtn" class="ghost">Request Admin Access</button>
+            <button id="refreshStatusBtn" class="ghost">Refresh Status</button>
+            <button id="signOutBtn1" class="ghost">Sign Out</button>
           </div>
         </div>
 
-        <!-- Add admin (visible to admins only) -->
-        <div id="adminControls" class="admin-panel" hidden>
-          <label class="field">
-            <span>Add Admin by UID</span>
-            <input id="newAdminUid" type="text" placeholder="Paste UID" />
-          </label>
-          <button id="addAdminBtn" class="ghost">Add Admin</button>
-        </div>
+        <!-- Admin panel — shown when verified admin -->
+        <div id="adminPanel" hidden>
 
-        <!-- Admin requests -->
-        <div class="admin-panel">
-          <h3>Admin Requests</h3>
-          <button id="requestAdminBtn" class="ghost">Request Admin Access</button>
-          <div id="requestsList" class="alerts-list">
-            <p class="note">Sign in to request or review admins.</p>
+          <div class="admin-panel">
+            <p id="adminWelcome" class="note"></p>
+            <div class="hero-actions">
+              <button id="enablePushBtn" class="ghost">Enable Push Notifications</button>
+              <button id="signOutBtn2" class="ghost">Sign Out</button>
+            </div>
+            <p id="pushStatus" class="note"></p>
           </div>
-        </div>
 
-        <!-- Live alert feed -->
-        <div class="admin-panel">
-          <h3>Latest Alerts</h3>
-          <div id="alertsList" class="alerts-list">
-            <p class="note">Sign in as admin to view alerts.</p>
+          <!-- Admin requests -->
+          <div class="admin-panel">
+            <h3>Admin Requests</h3>
+            <div id="requestsList" class="alerts-list">
+              <p class="note">No pending requests.</p>
+            </div>
           </div>
-        </div>
 
-        <!-- Push notifications -->
-        <div class="admin-panel">
-          <h3>Push Notifications</h3>
-          <p class="note">Enable push so you get alerts when the app is closed.</p>
-          <button id="enablePushBtn" class="ghost">Enable Push</button>
-          <p id="pushStatus" class="note"></p>
+          <!-- Live alerts -->
+          <div class="admin-panel">
+            <h3>Live Alerts</h3>
+            <div id="alertsList" class="alerts-list">
+              <p class="note">No alerts yet.</p>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -94,7 +96,7 @@
   </main>
 
   <footer class="footer">
-    <p>Admin access is audited and protected.</p>
+    <p>Built for community response in Dar es Salaam.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
