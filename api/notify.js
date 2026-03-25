@@ -24,8 +24,7 @@ module.exports = async function (req, res) {
     },
     body: JSON.stringify({
       app_id: (process.env.ONESIGNAL_APP_ID || "").trim(),
-      // Send to every device tagged as admin
-      filters: [{ field: "tag", key: "role", relation: "=", value: "admin" }],
+      included_segments: ["All"],
       headings: { en: `DarAlert: ${record.type}` },
       contents: { en: `${record.name} — ${record.address}` },
       web_url: "https://daralert.vercel.app/admin.html"
