@@ -25,7 +25,6 @@ const signUpBtn       = document.getElementById("signUpBtn");
 const authStatus      = document.getElementById("authStatus");
 const pendingStatus   = document.getElementById("pendingStatus");
 const requestAdminBtn = document.getElementById("requestAdminBtn");
-const refreshStatusBtn= document.getElementById("refreshStatusBtn");
 const signOutBtn1     = document.getElementById("signOutBtn1");
 const adminWelcome    = document.getElementById("adminWelcome");
 const enablePushBtn   = document.getElementById("enablePushBtn");
@@ -91,11 +90,6 @@ requestAdminBtn.addEventListener("click", async () => {
   requestAdminBtn.disabled = true;
 });
 
-refreshStatusBtn.addEventListener("click", async () => {
-  pendingStatus.textContent = "Refreshing…";
-  await db.auth.refreshSession();
-  // onAuthStateChange will fire automatically with the updated session
-});
 
 enablePushBtn.addEventListener("click", () => {
   OneSignalDeferred.push(async function(OneSignal) {
