@@ -5,7 +5,7 @@ module.exports = async function (req, res) {
   }
 
   // Verify the request is from our Supabase webhook
-  if (req.headers["x-webhook-secret"] !== process.env.WEBHOOK_SECRET) {
+  if (req.headers["x-webhook-secret"] !== (process.env.WEBHOOK_SECRET || "").trim()) {
     res.status(401).end();
     return;
   }
