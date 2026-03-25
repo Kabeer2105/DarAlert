@@ -28,7 +28,7 @@ module.exports = async function (req, res) {
       filters: [{ field: "tag", key: "role", relation: "=", value: "admin" }],
       headings: { en: `DarAlert: ${record.type}` },
       contents: { en: `${record.name} — ${record.address}` },
-      web_url: "/admin.html"
+      web_url: "https://daralert.vercel.app/admin.html"
     })
   });
 
