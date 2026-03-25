@@ -1,4 +1,7 @@
-const CACHE_NAME = "daralert-v6";
+// OneSignal push notifications (must be first)
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
+const CACHE_NAME = "daralert-v7";
 const ASSETS = [
   "/",
   "/index.html",
@@ -10,7 +13,8 @@ const ASSETS = [
   "/icon-192.svg",
   "/icon-512.svg",
   "/favicon.svg",
-  "/favicon.ico"
+  "/favicon.ico",
+  "/sw.js"
 ];
 
 self.addEventListener("install", (event) => {
