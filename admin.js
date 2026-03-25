@@ -139,9 +139,10 @@ function showPendingPanel(user) {
   authPanel.hidden    = true;
   pendingPanel.hidden = false;
   adminPanel.hidden   = true;
+  authStatus.textContent = "";
   const username = toUsername(user);
-  pageTitle.textContent    = `Hi, ${username}`;
-  pageSubtitle.textContent = "You are signed in but not yet an admin.";
+  pageTitle.textContent     = `Hi, ${username}`;
+  pageSubtitle.textContent  = "You are signed in but not yet an admin.";
   pendingStatus.textContent = "Request access below, or wait if you already did.";
 }
 
@@ -149,6 +150,7 @@ function showAdminPanel(user) {
   authPanel.hidden    = true;
   pendingPanel.hidden = true;
   adminPanel.hidden   = false;
+  authStatus.textContent = "";
   const username = toUsername(user);
   pageTitle.textContent    = "Admin Dashboard";
   pageSubtitle.textContent = `Welcome, ${username}.`;
