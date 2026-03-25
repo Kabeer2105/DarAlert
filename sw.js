@@ -1,4 +1,4 @@
-const CACHE_NAME = "daralert-v5";
+const CACHE_NAME = "daralert-v6";
 const ASSETS = [
   "/",
   "/index.html",
