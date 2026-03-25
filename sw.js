@@ -1,7 +1,4 @@
-// OneSignal push notifications (must be first)
-importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-
-const CACHE_NAME = "daralert-v7";
+const CACHE_NAME = "daralert-v8";
 const ASSETS = [
   "/",
   "/index.html",

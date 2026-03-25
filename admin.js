@@ -37,18 +37,10 @@ let alertsChannel   = null;
 let requestsChannel = null;
 let currentUser     = null;
 
-// Service worker + OneSignal
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
-}
+// OneSignal — let it manage its own service worker (OneSignalSDKWorker.js)
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(function(OneSignal) {
-  OneSignal.init({
-    appId: ONESIGNAL_APP_ID,
-    notifyButton: { enable: false },
-    serviceWorkerPath: "sw.js",
-    serviceWorkerParam: { scope: "/" }
-  });
+  OneSignal.init({ appId: ONESIGNAL_APP_ID, notifyButton: { enable: false } });
 });
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -96,13 +88,34 @@ requestAdminBtn.addEventListener("click", async () => {
 });
 
 
-enablePushBtn.addEventListener("click", () => {
-  OneSignalDeferred.push(async function(OneSignal) {
-    const granted = await OneSignal.Notifications.requestPermission();
-    if (!granted) { pushStatus.textContent = "Permission denied."; return; }
-    await OneSignal.User.addTag("role", "admin");
-    pushStatus.textContent = "Push enabled for this device.";
-  });
+enablePushBtn.addEventListener("click", async () => {
+  if (!("Notification" in window)) {
+    pushStatus.textContent = "Push notifications not supported on this browser.";
+    return;
+  }
+  if (Notification.permission === "denied") {
+    pushStatus.textContent = "Notifications are blocked. Go to browser settings and allow notifications for this site.";
+    return;
+  }
+  pushStatus.textContent = "Setting up push…";
+  try {
+    await new Promise((resolve, reject) => {
+      OneSignalDeferred.push(async function(OneSignal) {
+        try {
+          const granted = await OneSignal.Notifications.requestPermission();
+          if (!granted) { pushStatus.textContent = "Permission not granted."; resolve(); return; }
+          await OneSignal.User.addTag("role", "admin");
+          pushStatus.textContent = "Push enabled for this device.";
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  } catch (err) {
+    pushStatus.textContent = "Push setup failed: " + err.message;
+    console.error(err);
+  }
 });
 
 // ── Auth state ────────────────────────────────────────────────────────────────
