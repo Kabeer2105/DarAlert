@@ -32,5 +32,13 @@ module.exports = async function (req, res) {
   });
 
   const data = await response.json();
-  res.status(200).json({ ok: true, onesignal: data });
+  res.status(200).json({
+    ok: true,
+    onesignal: data,
+    debug: {
+      app_id: (process.env.ONESIGNAL_APP_ID || "MISSING").trim(),
+      key_prefix: (process.env.ONESIGNAL_REST_API_KEY || "MISSING").trim().slice(0, 15) + "...",
+      status: response.status
+    }
+  });
 };
