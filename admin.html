@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e61b23" />
+  <title>DarAlert Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Admin Only</p>
+      <h1>DarAlert Admin</h1>
+      <p class="tagline">Verify, respond, and keep Dar es Salaam safe.</p>
+      <div class="hero-actions">
+        <a class="ghost" href="index.html">Back to Emergency</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card admin">
+      <div class="card-header">
+        <h2>Admin Sign In</h2>
+        <p>Admins receive real-time alerts and can manage other admins.</p>
+      </div>
+
+      <div class="admin-body">
+
+        <!-- Auth -->
+        <div class="admin-panel">
+          <label class="field">
+            <span>Email</span>
+            <input id="emailInput" type="email" placeholder="admin@example.com" autocomplete="email" />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="passwordInput" type="password" placeholder="••••••••" autocomplete="current-password" />
+          </label>
+          <div class="hero-actions">
+            <button id="signInBtn" class="ghost">Sign In</button>
+            <button id="signUpBtn" class="ghost">Create Account</button>
+          </div>
+          <p id="adminStatus" class="note"></p>
+          <p class="note">Your UID: <span id="adminUid">—</span></p>
+          <div class="hero-actions">
+            <button id="copyUidBtn" class="ghost">Copy UID</button>
+            <button id="recheckAdminBtn" class="ghost">Recheck Admin</button>
+            <button id="signOutBtn" class="ghost">Sign Out</button>
+          </div>
+        </div>
+
+        <!-- Add admin (visible to admins only) -->
+        <div id="adminControls" class="admin-panel" hidden>
+          <label class="field">
+            <span>Add Admin by UID</span>
+            <input id="newAdminUid" type="text" placeholder="Paste UID" />
+          </label>
+          <button id="addAdminBtn" class="ghost">Add Admin</button>
+        </div>
+
+        <!-- Admin requests -->
+        <div class="admin-panel">
+          <h3>Admin Requests</h3>
+          <button id="requestAdminBtn" class="ghost">Request Admin Access</button>
+          <div id="requestsList" class="alerts-list">
+            <p class="note">Sign in to request or review admins.</p>
+          </div>
+        </div>
+
+        <!-- Live alert feed -->
+        <div class="admin-panel">
+          <h3>Latest Alerts</h3>
+          <div id="alertsList" class="alerts-list">
+            <p class="note">Sign in as admin to view alerts.</p>
+          </div>
+        </div>
+
+        <!-- Push notifications -->
+        <div class="admin-panel">
+          <h3>Push Notifications</h3>
+          <p class="note">Enable push so you get alerts when the app is closed.</p>
+          <button id="enablePushBtn" class="ghost">Enable Push</button>
+          <p id="pushStatus" class="note"></p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Admin access is audited and protected.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script src="admin.js" defer></script>
+</body>
+</html>

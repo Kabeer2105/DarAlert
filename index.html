@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e61b23" />
+  <title>DarAlert — Community Rapid Response</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Dar es Salaam, Tanzania</p>
+      <h1>DarAlert</h1>
+      <p class="tagline">Community Rapid Response — one tap, everyone notified.</p>
+      <div class="hero-actions">
+        <button id="installBtn" class="ghost" hidden>Install App</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card emergency">
+      <div class="card-header">
+        <h2>Send Emergency Alert</h2>
+        <p>For urgent community situations only.</p>
+      </div>
+
+      <form id="alertForm" class="form">
+        <div class="field">
+          <label>Emergency Type</label>
+          <div class="type-row">
+            <label class="pill">
+              <input type="radio" name="emergencyType" value="SICK" checked />
+              <span>Sick</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="emergencyType" value="FIRE" />
+              <span>Fire</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="emergencyType" value="PASSED_AWAY" />
+              <span>Passed Away</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="fullName">Your Name</label>
+          <input id="fullName" name="fullName" type="text" placeholder="e.g., Asha M." required />
+        </div>
+
+        <div class="field">
+          <label for="address">Location / Address</label>
+          <textarea id="address" name="address" rows="3" placeholder="Street, landmark, ward" required></textarea>
+        </div>
+
+        <button type="submit" class="panic">
+          <span class="pulse"></span>
+          Send Alert
+        </button>
+
+        <p class="note">Alerts are sent to verified admins only.</p>
+        <div id="status" class="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="card info">
+      <div class="card-header">
+        <h2>How it works</h2>
+        <p>Tap once, fill the basics, and the community responds.</p>
+      </div>
+      <ul class="steps">
+        <li>Choose the emergency type.</li>
+        <li>Add your name and location.</li>
+        <li>Send the alert to verified admins.</li>
+      </ul>
+      <p class="note">Admins sign in separately and receive alerts in real time.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built for community response in Dar es Salaam.</p>
+    <a class="ghost admin-entry" href="admin.html">Admin Sign In</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
