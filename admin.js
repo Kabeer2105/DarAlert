@@ -168,6 +168,12 @@ function showAdminPanel(user) {
   pageSubtitle.textContent = `Welcome, ${username}.`;
   adminWelcome.textContent = `Signed in as ${username}.`;
   startListeners();
+  // Ensure admin tag is always set when signed in
+  OneSignalDeferred.push(function(OneSignal) {
+    if (Notification.permission === "granted") {
+      OneSignal.User.addTag("role", "admin");
+    }
+  });
 }
 
 // ── Realtime ──────────────────────────────────────────────────────────────────
